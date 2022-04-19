@@ -8,24 +8,22 @@
  
  
 /* Top-level module. Combines the datapath and controller */
-module QAM_demapper(I_in, Q_in, sclk, dclk, rst, data_out); 
+module QAM_demapper(I_in, Q_in, sclk, dclk, rst, en, cal, data_out); 
 	// TODO: should this be unsigned? Maybe discuss w dr E
 	input signed [7:0] I_in, Q_in;	// Input I/Q signals, signed 8 bit number
-	input sclk, dclk, rst;	// Signal clk, output data clk, rst
-	output data_out; 			// Serial data out
+	input sclk, dclk, rst, en, cal; // Signal clk, output data clk, rst
+	output data_out; 				// Serial data out
 
 	wire latch_offset; 	// Used to normalize the datapath origin at no input
-	wire latch_reg; 		// Tell output SR to store demapped QAM value
-	wire shift;				// Tell the output SR to shift out contents
-
+	wire latch_reg; 	// Tell output SR to store demapped QAM value
+	wire shift;			// Tell the output SR to shift out contents
 
 	// Instantiate controller module
-	QAM_demapper_controller U1(/*.enable(enable), .calibrate(calibrate),*/ .rst(rst), .dclk(dclk), .sclk(sclk),
-									.latch_offset(latch_offset), .latch_reg(latch_reg), .shift(shift));
+	QAM_demapper_controller U1(.enable(en), .calibrate(cal), .rst(rst), .dclk(dclk), .sclk(sclk), 
+							.latch_offset(latch_offset), .latch_reg(latch_reg), .shift(shift));
 	// Instantiate demapper
-	QAM_demapper_datapath U2(.latch_offset(latch_offset), .latch_reg(latch_reg), .shift(shift), .rst(rst), 
-									.data_out(data_out), .dclk(dclk), .I_in(I_in), .Q_in(Q_in));
-
+	QAM_demapper_datapath U2(.latch_offset(latch_offset), .latch_reg(latch_reg), .shift(shift), 
+							.rst(rst), .data_out(data_out), .dclk(dclk), .I_in(I_in), .Q_in(Q_in));
 
 endmodule
  
@@ -36,7 +34,6 @@ module QAM_demapper_controller(rst, dclk, sclk, latch_offset, latch_reg, shift);
 	output latch_offset, latch_reg, shift;
 
 	// TODO: FSM diagram, logic
-
 
 endmodule
  
