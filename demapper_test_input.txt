@@ -1,16 +1,31 @@
-00000000_00000000
-00000000_00000000
-00000000_00000000
-00000000_00000000
-00000000_00000000
-00000000_00000000
-00000000_00000000
-00000000_00000000
-00000000_00000000
-00000000_00000000
-00000000_00000000
-00000000_00000000
-00000000_00000000
-00000000_00000000
-00000000_00000000
-00000000_00000000
+/* demapper_test_input.txt
+ * EE417 Final Project
+ * Zach Martin & Saunders Riley
+ * This file contains input data for the test bench of the QAM demapper project
+ * version 1 4/23/2022 ZM
+ */
+ 
+/* Because our input is signed 8 bit, the regions of interest are 0 < x < 64, 64< x < 128 
+ * ( and the equivalent on the negative axes).
+*/
+// Dec to int8 hex: -96 = 0xA0, -32 = 0xE0, 96 = 0x60, 32 = 0x20
+// I (int8)_Q (int8)_Output(uint8)
+A0_60_00
+A0_20_01
+A0_A0_02
+A0_E0_03
+
+E0_60_04
+E0_20_05
+E0_A0_06
+E0_E0_07
+
+60_60_08
+60_20_09
+60_A0_0A
+60_E0_0B
+
+20_60_0C
+20_20_0D
+20_A0_0E
+20_A0_0F
