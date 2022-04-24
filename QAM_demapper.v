@@ -23,13 +23,8 @@ module QAM_demapper(I_in, Q_in, sclk, dclk, rst, en, cal, data_out);
 							.latch_offset(latch_offset), .latch_reg(latch_reg), .shift(shift));
 	// Instantiate demapper
 	QAM_demapper_datapath U2(.latch_offset(latch_offset), .latch_reg(latch_reg), .shift(shift), 
-							.rst(rst), .data_out(data_out), .dclk(dclk), .I_in(I_in), .Q_in(Q_in), 
-							.symbol_clock(sclk));
-	
-	// FIFO IP. 4 bits wide, 8 bits deep
-	//fifo U3(.data(data), .rdclk(dclk), .rdreq(rdreq), .wrclk(sclk), .wrreq(wrreq), .q(data_out), 
-	//					.rdempty(rdempty), .wrfull(wrfull));
-	
+							.rst(rst), .data_out(data_out), .dclk(dclk), .I_in(I_in), .Q_in(Q_in), .symbol_clock(sclk));
+
 endmodule
  
  
@@ -45,17 +40,13 @@ endmodule
  
 /*datapath module, hard decision demapper */
 module QAM_demapper_datapath(latch_offset, latch_reg, shift, rst, dclk, data_out, I_in, Q_in, symbol_clock);
-	input latch_offset;				// Calibrate input to the origin
-	input latch_reg;				// Store demapped symbol in shift register
-	input shift;					// Shift out data
-	input rst, dclk, symbol_clock;	// input signal is at a different clock rate than output dclk
+	input latch_offset, latch_reg, shift, rst, dclk, symbol_clock;
 	input signed [7:0] I_in, Q_in;	// Input I/Q signals, signed 8 bit number
-	output reg data_out;			// Serial output
+	output reg data_out;
 	
-	reg signed [2:0] I, Q;			// Normalized I/Q Signals
-	reg [3:0] output_register;		
-	reg [3:0] input_register;	
-	reg signed [7:0] I_offset, Q_offset;
+	reg signed [2:0] I, Q;
+	reg [3:0] output_register;
+	reg [3:0] input_register;
 	
 	wire [3:0] val;
 
@@ -87,7 +78,7 @@ module QAM_demapper_datapath(latch_offset, latch_reg, shift, rst, dclk, data_out
 	assign val [2] = (I == 1)||(I==-1) ? 1 : 0;
 	assign val [3] = (I < 0)  ? 0 : 1;
 	
-	
+	// TODO: could use internal memory blocks to create a FIFO buffer of data
 	// output shift register using output data clock dclk
 	always @(posedge dclk)
 		if(rst) begin
