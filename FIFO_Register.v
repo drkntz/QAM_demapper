@@ -1,4 +1,4 @@
-// megafunction wizard: %FIFO%VBB%
+// megafunction wizard: %FIFO%
 // GENERATION: STANDARD
 // VERSION: WM1.0
 // MODULE: dcfifo 
@@ -17,6 +17,7 @@
 // 21.1.0 Build 842 10/21/2021 SJ Lite Edition
 // ************************************************************
 
+
 //Copyright (C) 2021  Intel Corporation. All rights reserved.
 //Your use of Intel Corporation's design tools, logic functions 
 //and other software and tools, and any partner logic 
@@ -32,6 +33,10 @@
 //refer to the applicable agreement for further details, at
 //https://fpgasoftware.intel.com/eula.
 
+
+// synopsys translate_off
+`timescale 1 ps / 1 ps
+// synopsys translate_on
 module FIFO_Register (
 	aclr,
 	data,
@@ -59,6 +64,44 @@ module FIFO_Register (
 `ifndef ALTERA_RESERVED_QIS
 // synopsys translate_on
 `endif
+
+	wire [3:0] sub_wire0;
+	wire  sub_wire1;
+	wire  sub_wire2;
+	wire [3:0] q = sub_wire0[3:0];
+	wire  rdempty = sub_wire1;
+	wire  wrfull = sub_wire2;
+
+	dcfifo	dcfifo_component (
+				.aclr (aclr),
+				.data (data),
+				.rdclk (rdclk),
+				.rdreq (rdreq),
+				.wrclk (wrclk),
+				.wrreq (wrreq),
+				.q (sub_wire0),
+				.rdempty (sub_wire1),
+				.wrfull (sub_wire2),
+				.eccstatus (),
+				.rdfull (),
+				.rdusedw (),
+				.wrempty (),
+				.wrusedw ());
+	defparam
+		dcfifo_component.intended_device_family = "Cyclone V",
+		dcfifo_component.lpm_numwords = 16,
+		dcfifo_component.lpm_showahead = "OFF",
+		dcfifo_component.lpm_type = "dcfifo",
+		dcfifo_component.lpm_width = 4,
+		dcfifo_component.lpm_widthu = 4,
+		dcfifo_component.overflow_checking = "ON",
+		dcfifo_component.rdsync_delaypipe = 4,
+		dcfifo_component.read_aclr_synch = "OFF",
+		dcfifo_component.underflow_checking = "ON",
+		dcfifo_component.use_eab = "ON",
+		dcfifo_component.write_aclr_synch = "OFF",
+		dcfifo_component.wrsync_delaypipe = 4;
+
 
 endmodule
 
