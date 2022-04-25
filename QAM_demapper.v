@@ -22,8 +22,7 @@ module QAM_demapper(I_in, Q_in, sclk, dclk, rst, en, cal, data_out);
 	QAM_demapper_controller U1(.enable(en), .calibrate(cal), .rst(rst), .dclk(dclk), .sclk(sclk), 
 							.latch_offset(latch_offset), .latch_reg(latch_reg), .shift(shift));
 	// Instantiate demapper
-	QAM_demapper_datapath U2(.latch_offset(latch_offset), .latch_reg(latch_reg), .shift(shift), 
-							.rst(rst), .data_out(data_out), .dclk(dclk), .I_in(I_in), .Q_in(Q_in), .symbol_clock(sclk));
+	QAM_demapper_datapath U2(.rst(rst), .data_out(data_out), .I_in(I_in), .Q_in(Q_in), .symbol_clock(sclk));
 
 endmodule
  
@@ -39,81 +38,47 @@ endmodule
  
  
 /*datapath module, hard decision demapper */
-module QAM_demapper_datapath(latch_offset, latch_reg, shift, rst, dclk, data_out, I_in, Q_in, symbol_clock);
-	input latch_offset, latch_reg, shift, rst, dclk, symbol_clock;
+module QAM_demapper_datapath(rst, data_out, I_in, Q_in, symbol_clock);
+	input rst, symbol_clock;
+	output wire [3:0] data_out;
 	input signed [7:0] I_in, Q_in;	// Input I/Q signals, signed 8 bit number
-	output reg data_out;
 	
 	reg signed [2:0] I, Q;
-	reg [3:0] output_register;
-	reg [3:0] input_register;
 	
-	wire [3:0] val;
-
+	
 	// De-noise 8 bit signed value by applying symbol boundaries & normalize to +/- 1, 3 (see matlab).
 	// Max Value of +127, -128, midrange approx 64
 	always @(posedge symbol_clock) begin
-		if(I_in > 64)
-			I = 3;
-		else if(I_in > 0)
-			I = 1;
-		else if(I_in > -64)
-			I = -1;
-		else 
-			I = -3;
-		
-		if(Q_in > 64)
-			Q = 3;
-		else if(Q_in > 0)
-			Q = 1;
-		else if(Q_in > -64)
-			Q = -1;
-		else 
-			Q = -3;
-	end 
-		
-	// Demap normalized input data to Grey encoding constellation (see matlab screenshot)
-	assign val [0] = (Q == 1)||(Q == -1) ? 1 : 0;
-	assign val [1] = (Q < 0)  ? 1 : 0;
-	assign val [2] = (I == 1)||(I==-1) ? 1 : 0;
-	assign val [3] = (I < 0)  ? 0 : 1;
-	
-	// TODO: could use internal memory blocks to create a FIFO buffer of data
-	// output shift register using output data clock dclk
-	always @(posedge dclk)
 		if(rst) begin
-			output_register <= 0;
-			data_out <= 0;
-		end 
-		
-		else if(shift) begin
-			output_register <= output_register >> 1;
-			data_out <= output_register[0];
+			I = 0;
+			Q = 0;
 		end
 		
-		else 
-			output_register <= input_register;
+		else begin
+			if(I_in > 64)
+				I = 3;
+			else if(I_in > 0)
+				I = 1;
+			else if(I_in > -64)
+				I = -1;
+			else 
+				I = -3;
+			
+			if(Q_in > 64)
+				Q = 3;
+			else if(Q_in > 0)
+				Q = 1;
+			else if(Q_in > -64)
+				Q = -1;
+			else 
+				Q = -3;
+		end
+	end 		
+		
+	// Demap normalized input data to Grey encoding constellation (see matlab screenshot)
+	assign data_out [0] = (Q == 1)||(Q == -1) ? 1 : 0;
+	assign data_out [1] = (Q < 0)  ? 1 : 0;
+	assign data_out [2] = (I == 1)||(I==-1) ? 1 : 0;
+	assign data_out [3] = (I < 0)  ? 0 : 1;
 	
-	// Asynchronous latching of input via controller
-	always @* 
-		if(latch_reg)
-			input_register <= val;
-
-
-	// TODO: create Shift register, instantiate primitive, use primitive, setup offsets
-endmodule
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
+endmodule 

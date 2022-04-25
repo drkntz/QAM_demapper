@@ -8,13 +8,13 @@ close all;
 clear all;
 
 M = 16;                         % The verilog project uses 16-qam
-num_symbols = 500;
+num_symbols = 100;
 filename = "matlab_test_data.txt";
-SNR = 15;                       % signal to noise ratio for awgn
+SNR = 4;                       % signal to noise ratio for awgn
 x = randi([0 M-1],[1 num_symbols]);    % Create array of random test values
 txSig = qammod(x, M);           % Modulate with given inputs
 scatterplot(txSig*32)           % show "clean" constellation diagram
-rxSig = int8(awgn(txSig,15)*32);% Add gaussian noise to signal
+rxSig = int8(awgn(txSig,SNR)*32);% Add gaussian noise to signal
 scatterplot(rxSig);             % Show "noisy" signal
 
 % Convert signals into hex for test file
