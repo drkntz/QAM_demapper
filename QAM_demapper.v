@@ -23,7 +23,7 @@ module QAM_demapper(I_in, Q_in, sclk, dclk, rst, en, cal, data_out);
 							.latch_offset(latch_offset), .latch_reg(latch_reg), .shift(shift));
 	// Instantiate demapper
 	QAM_demapper_datapath U2(.latch_offset(latch_offset), .latch_reg(latch_reg), .shift(shift), 
-							.rst(rst), .data_out(data_out), .dclk(dclk), .I_in(I_in), .Q_in(Q_in));
+							.rst(rst), .data_out(data_out), .dclk(dclk), .I_in(I_in), .Q_in(Q_in), .symbol_clock(sclk));
 
 endmodule
  
@@ -39,8 +39,8 @@ endmodule
  
  
 /*datapath module, hard decision demapper */
-module QAM_demapper_datapath(latch_offset, latch_reg, shift, rst, dclk, data_out, I_in, Q_in);
-	input latch_offset, latch_reg, shift, rst, dclk;
+module QAM_demapper_datapath(latch_offset, latch_reg, shift, rst, dclk, data_out, I_in, Q_in, symbol_clock);
+	input latch_offset, latch_reg, shift, rst, dclk, symbol_clock;
 	input signed [7:0] I_in, Q_in;	// Input I/Q signals, signed 8 bit number
 	output reg data_out;
 	
@@ -51,30 +51,31 @@ module QAM_demapper_datapath(latch_offset, latch_reg, shift, rst, dclk, data_out
 	wire [3:0] val;
 
 	// De-noise 8 bit signed value by applying symbol boundaries & normalize to +/- 1, 3 (see matlab).
-	always @* begin
-		if(I_in > 128)
+	// Max Value of +127, -128, midrange approx 64
+	always @(posedge symbol_clock) begin
+		if(I_in > 64)
 			I = 3;
 		else if(I_in > 0)
 			I = 1;
-		else if(I_in > -128)
+		else if(I_in > -64)
 			I = -1;
 		else 
 			I = -3;
 		
-		if(Q_in > 128)
+		if(Q_in > 64)
 			Q = 3;
 		else if(Q_in > 0)
 			Q = 1;
-		else if(Q_in > -128)
+		else if(Q_in > -64)
 			Q = -1;
 		else 
 			Q = -3;
 	end 
 		
 	// Demap normalized input data to Grey encoding constellation (see matlab screenshot)
-	assign val [0] = (Q == 1) ? 1 : 0;
+	assign val [0] = (Q == 1)||(Q == -1) ? 1 : 0;
 	assign val [1] = (Q < 0)  ? 1 : 0;
-	assign val [2] = (I == 1) ? 1 : 0;
+	assign val [2] = (I == 1)||(I==-1) ? 1 : 0;
 	assign val [3] = (I < 0)  ? 0 : 1;
 	
 	// TODO: could use internal memory blocks to create a FIFO buffer of data
