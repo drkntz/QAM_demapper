@@ -24,7 +24,8 @@ module QAM_demapper_controller(enable, reset, sclk, dclk, read_enable, wfull, rd
 	*/
 	
 	input enable, reset, sclk, dclk, read_enable, wfull, rdempty;
-	output reg wclk, rdclk, aclr, available, complete;
+	output reg wclk, rdclk, available, complete;
+	output aclr;
 	
 	reg[1:0] state, nextstate;
 	

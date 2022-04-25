@@ -57,10 +57,6 @@ set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name VERILOG_FILE QAM_demapper_datapath.v
 set_global_assignment -name VERILOG_FILE QAM_demapper_controller.v
-set_global_assignment -name QIP_FILE FIFO_Register.qip
-set_global_assignment -name QIP_FILE fifo.qip
-set_global_assignment -name QIP_FILE fifo_bb.qip
-set_global_assignment -name VERILOG_FILE FIFO_Register_bb.v
 set_global_assignment -name VERILOG_FILE QAM_demapper.v
 set_global_assignment -name VERILOG_FILE QAM_demapper_tb.v
 set_global_assignment -name TEXT_FILE demapper_test_input.txt
