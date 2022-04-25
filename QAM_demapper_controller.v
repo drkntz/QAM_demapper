@@ -46,7 +46,7 @@ module QAM_demapper_controller(enable, reset, sclk, dclk, read_enable, wfull, rd
 			2'b01: begin //receive state
 				wclk = sclk;
 				rdclk = 0;
-				if(enable == 1 || reset == 1) nextstate = 2'b00;
+				if(enable == 0 || reset == 1) nextstate = 2'b00;
 				else if(wfull == 1) begin
 					nextstate = 2'b10; //if the FIFO is full, transition to data ready state
 					available = 1; //raise the data available flag to the host device
@@ -63,14 +63,14 @@ module QAM_demapper_controller(enable, reset, sclk, dclk, read_enable, wfull, rd
 				rdclk = 0;
 				available = 1;
 				complete = 0;
-				if(enable == 1 || reset == 1) nextstate = 2'b00;
+				if(enable == 0 || reset == 1) nextstate = 2'b00;
 				else if(read_enable == 1) nextstate = 2'b11;
 				else nextstate = 2'b10;
 			end
 			2'b11: begin //read out state
 				wclk = sclk;
 				rdclk = dclk;
-				if(enable == 1 || reset == 1) nextstate = 2'b00;
+				if(enable == 0 || reset == 1) nextstate = 2'b00;
 				else if(rdempty == 1) begin
 					available = 0;
 					complete = 1; //raise the transmission complete flag to the host device
