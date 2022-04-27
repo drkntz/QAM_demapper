@@ -18,16 +18,11 @@ module QAM_demapper(I_in, Q_in, sclk, dclk, enable, data_out);
 	wire [3:0] demapped_data;
 
 	// Instantiate controller module
-<<<<<<< HEAD
-	QAM_demapper_controller U1(.enable(en), .reset(rst), .dclk(dclk), .sclk(sclk), 
-							.read_enable(shift));
-=======
 	QAM_demapper_controller U1(.enable(enable), .reset(reset), .dclk(dclk), 
 							.read_enable(read_enable), .write_enable(write_enable), 
 							.wfull(fifo_full), .rdempty(fifo_empty), .available(available), 
 							.complete(complete));
 	
->>>>>>> e804dc42769574773274f92ff012b7cf59a5834b
 	// Instantiate demapper
 	QAM_demapper_datapath  U2(.rst(reset), .data_out(demapped_data), .I_in(I_in), .Q_in(Q_in), 
 							.symbol_clock(sclk));
