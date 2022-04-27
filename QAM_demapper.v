@@ -19,8 +19,8 @@ module QAM_demapper(I_in, Q_in, sclk, dclk, rst, en, cal, data_out);
 	wire shift;			// Tell the output SR to shift out contents
 
 	// Instantiate controller module
-	QAM_demapper_controller U1(.enable(en), .calibrate(cal), .rst(rst), .dclk(dclk), .sclk(sclk), 
-							.latch_offset(latch_offset), .latch_reg(latch_reg), .shift(shift));
+	QAM_demapper_controller U1(.enable(en), .reset(rst), .dclk(dclk), .sclk(sclk), 
+							.read_enable(shift));
 	// Instantiate demapper
 	QAM_demapper_datapath U2(.rst(rst), .data_out(data_out), .I_in(I_in), .Q_in(Q_in), .symbol_clock(sclk));
 
