@@ -1,5 +1,5 @@
 /* controller module. Controls hard decision demapper */
-module QAM_demapper_controller(enable, reset, dclk, read_enable, write_enable, wfull, rdempty, available, complete);
+module QAM_demapper_controller(enable, reset, dclk, read, read_enable, write_enable, wfull, rdempty, available, complete, state, nextstate);
 	/*	I/O Schema:
 	*	*	INPUTS:
 	*	*	*	enable = enables the module
@@ -22,7 +22,7 @@ module QAM_demapper_controller(enable, reset, dclk, read_enable, write_enable, w
 	*	*	State 3 (2'b11): Read Out - reading data out of FIFO
 	*/
 	
-	input enable, reset, dclk, wfull, rdempty;
+	input enable, reset, dclk, read, wfull, rdempty;
 	output reg read_enable, write_enable, available, complete;
 	
 	output reg[1:0] state, nextstate;
@@ -47,8 +47,8 @@ module QAM_demapper_controller(enable, reset, dclk, read_enable, write_enable, w
 				else nextstate = 2'b00;
 			end
 			2'b01: begin //receive state
-				wclk = sclk;
-				rdclk = 0;
+				write_enable = 1;
+				read_enable = 0;
 				if(enable == 0 || reset == 1) nextstate = 2'b00; //if enable goes low or reset goes high, transition to idle state
 				else if(wfull == 1) begin
 					nextstate = 2'b10; //if the FIFO is full, transition to data ready state
@@ -63,10 +63,11 @@ module QAM_demapper_controller(enable, reset, dclk, read_enable, write_enable, w
 			end
 			2'b10: begin //data ready state
 				write_enable = 0; //drops data received in this state!
+				read_enable = 0;
 				available = 1;
 				complete = 0;
 				if(enable == 0 || reset == 1) nextstate = 2'b00; //if enable goes low or reset goes high, transition to idle state
-				else if(read_enable == 1) nextstate = 2'b11;
+				else if(read == 1) nextstate = 2'b11;
 				else nextstate = 2'b10;
 			end
 			2'b11: begin //read out state
