@@ -1,6 +1,6 @@
 /*datapath module, hard decision demapper */
 module QAM_demapper_datapath(rst, data_out, I_in, Q_in, symbol_clock);
-	input rst, symbol_clock;
+	input rst, symbol_clock;		// Reset signal from controller, symbol clock from data clock recovery
 	output wire [3:0] data_out;
 	input signed [7:0] I_in, Q_in;	// Input I/Q signals, signed 8 bit number
 	
