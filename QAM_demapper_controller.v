@@ -4,15 +4,15 @@ module QAM_demapper_controller(enable, reset, dclk, read, read_enable, write_ena
 	*	*	INPUTS:
 	*	*	*	enable = enables the module
 	*	*	*	reset = resets the FSM and clears the FIFO
-	*	*	*	sclk = symbol clock (input clock from demod circuit)
 	*	*	*	dclk = digital clock (input clock from host device)
-	*	*	*	read_enable = enables the output of the FIFO register
+	*	*	*	read = host read signal
 	*	*	*	wfull = FIFO register full flag
 	*	*	*	rdempty = FIFO register empty flag
 	*	*
 	*	*	OUTPUTS:
+	*	*	*	read_enable = enables reading from the FIFO register
+	*	*	*	write_enable = enables writing to the FIFO register
 	*	*	*	wclk = FIFO register write clock
-	*	*	*	aclr = FIFO register asynchronous clear
 	*	*	*	available = host device data available flag
 	*	*	*	complete = host device complete flag
 	*	State Schema:
