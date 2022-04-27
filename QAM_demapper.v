@@ -8,7 +8,7 @@
  
  
 /* Top-level module. Combines the datapath and controller */
-module QAM_demapper(I_in, Q_in, sclk, dclk, enable, data_out); 
+module QAM_demapper(I_in, Q_in, sclk, dclk, enable, read, data_out);
 	input signed [7:0] I_in, Q_in;	// Input I/Q signals, signed 8 bit number
 	input sclk, dclk, enable; 
 	output [3:0]data_out; 				// parallel data out
@@ -18,7 +18,7 @@ module QAM_demapper(I_in, Q_in, sclk, dclk, enable, data_out);
 	wire [3:0] demapped_data;
 
 	// Instantiate controller module
-	QAM_demapper_controller U1(.enable(enable), .reset(reset), .dclk(dclk), 
+	QAM_demapper_controller U1(.enable(enable), .reset(reset), .dclk(dclk), .read(read),
 							.read_enable(read_enable), .write_enable(write_enable), 
 							.wfull(fifo_full), .rdempty(fifo_empty), .available(available), 
 							.complete(complete));
