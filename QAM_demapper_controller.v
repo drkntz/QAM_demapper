@@ -1,9 +1,5 @@
 /* controller module. Controls hard decision demapper */
-<<<<<<< HEAD
-module QAM_demapper_controller(enable, reset, sclk, dclk, read_enable, wfull, rdempty, wclk, rdclk, aclr, available, complete, state, nextstate);
-=======
 module QAM_demapper_controller(enable, reset, dclk, read_enable, write_enable, wfull, rdempty, available, complete);
->>>>>>> e804dc42769574773274f92ff012b7cf59a5834b
 	/*	I/O Schema:
 	*	*	INPUTS:
 	*	*	*	enable = enables the module
@@ -51,14 +47,9 @@ module QAM_demapper_controller(enable, reset, dclk, read_enable, write_enable, w
 				else nextstate = 2'b00;
 			end
 			2'b01: begin //receive state
-<<<<<<< HEAD
 				wclk = sclk;
 				rdclk = 0;
 				if(enable == 0 || reset == 1) nextstate = 2'b00; //if enable goes low or reset goes high, transition to idle state
-=======
-				write_enable = 1;
-				if(enable == 0 || reset == 1) nextstate = 2'b00;
->>>>>>> e804dc42769574773274f92ff012b7cf59a5834b
 				else if(wfull == 1) begin
 					nextstate = 2'b10; //if the FIFO is full, transition to data ready state
 					available = 1; //raise the data available flag to the host device
@@ -74,25 +65,14 @@ module QAM_demapper_controller(enable, reset, dclk, read_enable, write_enable, w
 				write_enable = 0; //drops data received in this state!
 				available = 1;
 				complete = 0;
-<<<<<<< HEAD
 				if(enable == 0 || reset == 1) nextstate = 2'b00; //if enable goes low or reset goes high, transition to idle state
 				else if(read_enable == 1) nextstate = 2'b11;
 				else nextstate = 2'b10;
 			end
 			2'b11: begin //read out state
-				wclk = sclk;
-				rdclk = dclk;
-				if(enable == 0 || reset == 1) nextstate = 2'b00; //if enable goes low or reset goes high, transition to idle state
-=======
-				if(enable == 0 || reset == 1) nextstate = 2'b00;
-				else if(enable == 1) nextstate = 2'b11;
-				else nextstate = 2'b10;
-			end
-			2'b11: begin //read out state
 				write_enable = 0;
 				read_enable = 1;
-				if(enable == 0 || reset == 1) nextstate = 2'b00;
->>>>>>> e804dc42769574773274f92ff012b7cf59a5834b
+				if(enable == 0 || reset == 1) nextstate = 2'b00; //if enable goes low or reset goes high, transition to idle state
 				else if(rdempty == 1) begin
 					available = 0;
 					complete = 1; //raise the transmission complete flag to the host device
