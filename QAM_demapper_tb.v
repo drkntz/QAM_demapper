@@ -6,7 +6,8 @@
  */
  
  
-module QAM_demapper_tb();
+module QAM_demapper_tb();	// Test top level module
+	
 endmodule
 
 module QAM_demapper_datapath_tb();

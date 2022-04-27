@@ -8,21 +8,29 @@
  
  
 /* Top-level module. Combines the datapath and controller */
-module QAM_demapper(I_in, Q_in, sclk, dclk, rst, en, cal, data_out); 
-	// TODO: should this be unsigned? Maybe discuss w dr E
+module QAM_demapper(I_in, Q_in, sclk, dclk, enable, data_out); 
 	input signed [7:0] I_in, Q_in;	// Input I/Q signals, signed 8 bit number
-	input sclk, dclk, rst, en, cal; // Signal clk, output data clk, rst
-	output data_out; 				// Serial data out
+	input sclk, dclk, enable; 
+	output [3:0]data_out; 				// parallel data out
 
-	wire latch_offset; 	// Used to normalize the datapath origin at no input
-	wire latch_reg; 	// Tell output SR to store demapped QAM value
-	wire shift;			// Tell the output SR to shift out contents
+	wire reset, wfull, rdempty, available, complete, read_enable, write_enable;
+	wire fifo_full, fifo_empty;
+	wire [3:0] demapped_data;
 
 	// Instantiate controller module
-	QAM_demapper_controller U1(.enable(en), .calibrate(cal), .rst(rst), .dclk(dclk), .sclk(sclk), 
-							.latch_offset(latch_offset), .latch_reg(latch_reg), .shift(shift));
+	QAM_demapper_controller U1(.enable(enable), .reset(reset), .dclk(dclk), 
+							.read_enable(read_enable), .write_enable(write_enable), 
+							.wfull(fifo_full), .rdempty(fifo_empty), .available(available), 
+							.complete(complete));
+	
 	// Instantiate demapper
-	QAM_demapper_datapath U2(.rst(rst), .data_out(data_out), .I_in(I_in), .Q_in(Q_in), .symbol_clock(sclk));
+	QAM_demapper_datapath  U2(.rst(reset), .data_out(demapped_data), .I_in(I_in), .Q_in(Q_in), 
+							.symbol_clock(sclk));
+	
+	// Fifo buffer
+	FIFO_Register          U3 (.aclr(reset), .rdreq(read_enable), .wrreq(write_enable),
+							.data(demapped_data), .q(data_out), .rdclk(dclk), 
+							.rdempty(fifo_empty), .wrfull(fifo_full));
 
 endmodule
 //end of file

@@ -1,5 +1,5 @@
 /* controller module. Controls hard decision demapper */
-module QAM_demapper_controller(enable, reset, sclk, dclk, read_enable, wfull, rdempty, wclk, rdclk, aclr, available, complete);
+module QAM_demapper_controller(enable, reset, dclk, read_enable, write_enable, wfull, rdempty, available, complete);
 	/*	I/O Schema:
 	*	*	INPUTS:
 	*	*	*	enable = enables the module
@@ -12,7 +12,6 @@ module QAM_demapper_controller(enable, reset, sclk, dclk, read_enable, wfull, rd
 	*	*
 	*	*	OUTPUTS:
 	*	*	*	wclk = FIFO register write clock
-	*	*	*	rdclk = FIFO register read clock
 	*	*	*	aclr = FIFO register asynchronous clear
 	*	*	*	available = host device data available flag
 	*	*	*	complete = host device complete flag
@@ -23,9 +22,8 @@ module QAM_demapper_controller(enable, reset, sclk, dclk, read_enable, wfull, rd
 	*	*	State 3 (2'b11): Read Out - reading data out of FIFO
 	*/
 	
-	input enable, reset, sclk, dclk, read_enable, wfull, rdempty;
-	output reg wclk, rdclk, available, complete;
-	output aclr;
+	input enable, reset, dclk, wfull, rdempty;
+	output reg read_enable, write_enable, available, complete;
 	
 	reg[1:0] state, nextstate;
 	
@@ -36,8 +34,7 @@ module QAM_demapper_controller(enable, reset, sclk, dclk, read_enable, wfull, rd
 	always begin //combinational logic
 		case(state)
 			2'b00: begin //idle state
-				wclk = 0;
-				rdclk = 0;
+				write_enable = 0;
 				available = 0;
 				complete = 1;
 				
@@ -45,8 +42,7 @@ module QAM_demapper_controller(enable, reset, sclk, dclk, read_enable, wfull, rd
 				else nextstate = 2'b00;
 			end
 			2'b01: begin //receive state
-				wclk = sclk;
-				rdclk = 0;
+				write_enable = 1;
 				if(enable == 0 || reset == 1) nextstate = 2'b00;
 				else if(wfull == 1) begin
 					nextstate = 2'b10; //if the FIFO is full, transition to data ready state
@@ -60,17 +56,16 @@ module QAM_demapper_controller(enable, reset, sclk, dclk, read_enable, wfull, rd
 				end
 			end
 			2'b10: begin //data ready state
-				wclk = 0; //drops data received in this state!
-				rdclk = 0;
+				write_enable = 0; //drops data received in this state!
 				available = 1;
 				complete = 0;
 				if(enable == 0 || reset == 1) nextstate = 2'b00;
-				else if(read_enable == 1) nextstate = 2'b11;
+				else if(enable == 1) nextstate = 2'b11;
 				else nextstate = 2'b10;
 			end
 			2'b11: begin //read out state
-				wclk = sclk;
-				rdclk = dclk;
+				write_enable = 0;
+				read_enable = 1;
 				if(enable == 0 || reset == 1) nextstate = 2'b00;
 				else if(rdempty == 1) begin
 					available = 0;
@@ -85,7 +80,6 @@ module QAM_demapper_controller(enable, reset, sclk, dclk, read_enable, wfull, rd
 			end
 		endcase
 	end
-	assign aclr = reset; //clear the FIFO on reset
 	
 endmodule
 //end of file
