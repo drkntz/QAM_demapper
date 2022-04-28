@@ -8,12 +8,13 @@
  
  
 /* Top-level module. Combines the datapath and controller */
-module QAM_demapper(I_in, Q_in, sclk, dclk, enable, read, data_out);
+module QAM_demapper(I_in, Q_in, sclk, dclk, enable, read, data_out, available, complete);
 	input signed [7:0] I_in, Q_in;	// Input I/Q signals, signed 8 bit number
-	input sclk, dclk, enable; 
+	input sclk, dclk, enable, read; 
 	output [3:0]data_out; 				// parallel data out
+	output available, complete;
 
-	wire reset, wfull, rdempty, available, complete, read_enable, write_enable;
+	wire reset, wfull, rdempty,  read_enable, write_enable;
 	wire fifo_full, fifo_empty;
 	wire [3:0] demapped_data;
 
@@ -29,7 +30,7 @@ module QAM_demapper(I_in, Q_in, sclk, dclk, enable, read, data_out);
 	
 	// Fifo buffer
 	FIFO_Register          U3 (.aclr(reset), .rdreq(read_enable), .wrreq(write_enable),
-							.data(demapped_data), .q(data_out), .rdclk(dclk), 
+							.data(demapped_data), .q(data_out), .rdclk(dclk), .wrclk(sclk), 
 							.rdempty(fifo_empty), .wrfull(fifo_full));
 
 endmodule

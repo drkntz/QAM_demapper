@@ -42,6 +42,7 @@ module QAM_demapper_controller(enable, reset, dclk, read, read_enable, write_ena
 				write_enable = 0;
 				available = 0;
 				complete = 1;
+				read_enable = 0;
 				
 				if(enable == 1 && reset == 0) nextstate = 2'b01; //if enable goes high, transition to receive state
 				else nextstate = 2'b00;

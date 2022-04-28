@@ -7,9 +7,58 @@
  
  
 module QAM_demapper_tb();	// Test top level module
+
+	QAM_demapper UUT(I_in, Q_in, sclk, dclk, enable, read, data_out, available, complete);
+	
+	reg signed [7:0] I_in, Q_in;
+	reg [3:0] expected_dout;
+	reg sclk, dclk, enable, read;
+	wire [3:0] data_out;
+	wire available, complete;
+	int i;
+	
+	reg [23:0] test_input [0:99]; // two test input words I_data_Q_data
+	
+	wire rst_internal; 
+	assign rst_internal = UUT.reset;
+	
+	initial begin
+		I_in = 0;
+		Q_in = 0;
+		sclk = 1;
+		dclk = 1;
+		enable = 1; 
+		read = 1;
+		
+	end
+	
+	always 
+		#5 sclk = ~sclk;
+	
+	always 
+		#20 dclk = ~dclk;
+	
+	initial begin
+		$readmemh("S:\\projects\\QAM_demapper\\matlab_test_data.txt", test_input);
+		#10;
+		for (i=0; i<100; i=i+1)begin
+			{I_in, Q_in, expected_dout} = test_input[i];
+			
+			
+			
+			#20 begin //$display("I = %d  Q = %d i_internal = %d q_internal = %d  expected = %H  out = %H", I_in, Q_in, i_internal, q_internal, expected_dout, data_out);
+			if(data_out != expected_dout)
+				$display("ERROR detected at i = %d, q = %d, expected = %H, output = %H", I_in, Q_in, expected_dout, data_out);
+			end
+		end	
+	end
+	
+	
 	
 endmodule
 
+
+/* datapath test bench */
 module QAM_demapper_datapath_tb();
 	reg signed [7:0] I_in, Q_in;
 	reg sclk,rst;
