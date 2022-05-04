@@ -26,14 +26,15 @@ module QAM_demapper_controller(enable, reset, dclk, read, read_enable, write_ena
 	output reg read_enable, write_enable, available, complete;
 	
 	output reg[1:0] state, nextstate;
-	
-	initial begin
-		state = 2'b00;
-		nextstate = 2'b00;
-	end
+
 	
 	always @ (posedge dclk) begin //Mealy Machine operates off the dclk
-		state <= nextstate;
+		if(reset) begin
+			state <= 2'b00;
+		end
+		
+		else
+			state <= nextstate;
 	end
 	
 	always @* begin //combinational logic

@@ -8,7 +8,7 @@ close all;
 clear all;
 
 M = 16;                         % The verilog project uses 16-qam
-num_symbols = 10000;
+num_symbols = 100;
 filename = "matlab_test_data.txt";
 SNR = 3;                       % signal to noise ratio for awgn
 x = randi([0 M-1],[1 num_symbols]);    % Create array of random test values
