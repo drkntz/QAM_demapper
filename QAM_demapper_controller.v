@@ -73,7 +73,7 @@ module QAM_demapper_controller(enable, reset, dclk, read, read_enable, write_ena
 				else nextstate = 2'b10;
 			end
 			2'b11: begin //read out state
-				write_enable = 0;
+				write_enable = 1;
 				read_enable = 1;
 				if(enable == 0 || reset == 1) nextstate = 2'b00; //if enable goes low or reset goes high, transition to idle state
 				else if(rdempty == 1) begin
