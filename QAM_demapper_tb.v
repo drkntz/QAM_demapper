@@ -17,10 +17,12 @@ module QAM_demapper_tb();	// Test top level module
 	integer i;						// Loop index for accessing Matlab generated file
 	reg [23:0] test_input [0:99]; 	// two test input words I_data_Q_data
 	wire rst_internal; 				// View internal wire 
+	wire [1:0] state_internal;
 	
 	QAM_demapper UUT1(I_in, Q_in, sclk, dclk, enable, read, data_out, available, complete, reset);
 	
 	assign rst_internal = UUT1.reset;
+	assign state_internal = UUT1.U1.state;
 	
 	initial begin	// Set all registers at start
 		I_in = 0;
@@ -28,9 +30,10 @@ module QAM_demapper_tb();	// Test top level module
 		sclk = 1;
 		dclk = 1;
 		enable = 1; 
-		read = 1;
+		read = 0;
 		reset = 1;
 		#10 reset = 0;
+		#200 read = 1;
 	end
 	
 	// Begin clock. dclk is 4x sclk. 
